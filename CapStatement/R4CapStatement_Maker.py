@@ -183,47 +183,42 @@ def main():
     path_map = si['paths']
     path_map
 
-# %% [markdown]
-# #### Then Use Jinja2 template to create narrative
+    in_path = ''
+    in_file = 'R4capabilitystatement-server.j2'
+
+    env = Environment(
+        loader=FileSystemLoader(searchpath=in_path),
+        autoescape=select_autoescape(['html', 'xml', 'xhtml', 'j2', 'md'])
+    )
+
+    env.filters['markdown'] = markdown
 
 
-# %%
-in_path = ''
-in_file = 'R4capabilitystatement-server.j2'
+    template = env.get_template(in_file)
 
-env = Environment(
-    loader=FileSystemLoader(searchpath=in_path),
-    autoescape=select_autoescape(['html', 'xml', 'xhtml', 'j2', 'md'])
-)
+    sp_map = {sp.code: sp.type for sp in df_sp.itertuples(index=True)}
+    pname_map = {p.Profile: p.Name for p in df_profiles.itertuples(index=True)}
+    pprint(pname_map)
 
-env.filters['markdown'] = markdown
+    rendered = template.render(cs=cs, path_map=path_map,
+                            pname_map=pname_map, sp_map=sp_map)
 
-
-template = env.get_template(in_file)
-
-sp_map = {sp.code: sp.type for sp in df_sp.itertuples(index=True)}
-pname_map = {p.Profile: p.Name for p in df_profiles.itertuples(index=True)}
-pprint(pname_map)
-
-rendered = template.render(cs=cs, path_map=path_map,
-                           pname_map=pname_map, sp_map=sp_map)
-
-display(HTML(rendered))
+    display(HTML(rendered))
 
 
-parser = etree.XMLParser(remove_blank_text=True)
-root = etree.fromstring(rendered, parser=parser)
+    parser = etree.XMLParser(remove_blank_text=True)
+    root = etree.fromstring(rendered, parser=parser)
 
-div = (etree.tostring(root[1][0], encoding='unicode', method='html'))
-narr = N.Narrative()
-narr.status = 'generated'
-narr.div = div
-cs.text = narr
-# save to file
-print('...........saving to file............')
-path = Path.cwd() / f'capabilitystatement-{cs.id.lower()}.json'
-path.write_text(dumps(cs.as_json(), indent=4))
-print(f"CapabilityStatement saved to:\n\t {path}")
+    div = (etree.tostring(root[1][0], encoding='unicode', method='html'))
+    narr = N.Narrative()
+    narr.status = 'generated'
+    narr.div = div
+    cs.text = narr
+    # save to file
+    print('...........saving to file............')
+    path = Path.cwd() / f'capabilitystatement-{cs.id.lower()}.json'
+    path.write_text(dumps(cs.as_json(), indent=4))
+    print(f"CapabilityStatement saved to:\n\t {path}")
 
 
 def get_conf(conf='MAY', as_dict=False):
