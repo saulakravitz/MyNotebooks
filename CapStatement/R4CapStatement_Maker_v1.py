@@ -40,6 +40,7 @@ import fhirclient.r4models.fhirreference as FR
 from json import dumps, loads, load
 from requests import get, post, put
 import os
+import HTML
 from pathlib import Path
 from csv import reader as csvreader
 from IPython.display import display as Display, HTML, Markdown
@@ -91,39 +92,14 @@ publisher_endpoint = dict(
                         )
 
 
-#ig_package_tar_path =  "//ERICS-AIR-2/ehaas/Documents/FHIR/US-Core-R4/output"  # !! Change back to US-Core
-#ig_package_path =  "//ERICS-AIR-2/ehaas/.fhir/packages/hl7.fhir.us.core.argo#dev" # !! Change back to r4
+
 ig_package_tar_path =  "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-Notifications/output"
 ig_package_path =  "//ERICS-AIR-2/ehaas/.fhir/packages/hl7.fhir.us.davinci-alerts#dev/package"
-#ig_package_tar_path =  "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-DEQM/output"
-#ig_package_path =  "//ERICS-AIR-2/ehaas/.fhir/packages/hl7.fhir.us.davinci-deqm#dev"
-#ig_package_path = "C:/Users/Administrator/Downloads/"
-#ig_source_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/US-Core-R4/source/" # !! Change back to US-Core
-#ig_source_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-DEQM/source/"
 ig_source_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-Notifications/source/"
-#ig_source_path = "/Users/ehaas/Documents/FHIR/US-Core-R4/source/"
-#ig_source_path = ''
-
 # spreadsheet source
-#in_path = '/Users/ehaas/Documents/FHIR/pyfhir/test/'
-#in_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/US-Core-R4/source/source_spreadsheets/"  # !! Change back to US-Core
-#in_file ="uscore-server"
-#in_file ="uscore-client"
 in_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-Notifications/source/resources/source-data/capstatements-spreadsheets/"
 in_file ="alert-initiator"
-#in_file ="alert-receiver"
-#in_file ="query-responder"
-#in_file ="query-requester"
-#in_path = "//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-DEQM/source/resources/source-data/"
-#in_file = "DEQM_Capability_Statement_Consumer_Client"
-#in_file = "DEQM_Capability_Statement_Reporter_Client"
-#in_file = "DEQM_Capability_Statement_Consumer_Server"
-#in_file = "DEQM_Capability_Statement_Producer_Client"
-#in_file = "DEQM_Capability_Statement_Producer_Server"
-#in_file = "DEQM_Capability_Statement_Receiver_Server"
-#"\\ERICS-AIR-2\ehaas\Documents\FHIR\Davinci-Alerts\source\resources\source-data\alert-sender.xlsx"
-#'//ERICS-AIR-2/ehaas/Documents/FHIR/Davinci-Alerts/source/resources/source_data/alert-sender.xlsx'
-#******************** Need to update when changing IGs *************************************************
+
 
 f_jurisdiction =  CC.CodeableConcept({
       "coding" : [

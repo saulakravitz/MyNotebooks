@@ -21,6 +21,10 @@ import fhirclient.r4models.codeableconcept as CC
 import fhirclient.r4models.fhirdate as D
 import fhirclient.r4models.extension as X
 import fhirclient.r4models.contactdetail as CD
+import fhirclient.r4models.narrative as N
+import fhirclient.r4models.bundle as B
+
+import tarfile
 # import fhirclient.r4models.narrative as N
 from json import dumps, loads
 from requests import post
@@ -78,6 +82,7 @@ def main():
         value=config_df.Value.publishervalue,
     )
 
+    definitions_file = config_df.Value.definitions_file   #source of  spec.internal file manually extracted from downloaded spec
     # Read the meta sheet from the spreadsheet
     meta_df = read_excel(xls, 'meta', na_filter=False)
     meta_dict = dict(zip(meta_df.Element, meta_df.Value))
@@ -97,8 +102,8 @@ def main():
     ))
     cs.rest = [rest]
 
-    profiles_df = read_excel(xls, 'profiles', na_filter=False)
-    profiles_df = profiles_df[profiles_df.Profile.str[0] != '!']
+    df_profiles = read_excel(xls, 'profiles', na_filter=False)
+    df_profiles = df_profiles[df_profiles.Profile.str[0] != '!']
 
     resources_df = read_excel(xls, 'resources', na_filter=False)
     resources_df = resources_df[resources_df.type.str[0] != '!']
@@ -110,7 +115,7 @@ def main():
 
     rest.resource = []
     for r in resources_df.itertuples(index=True):
-        supported_profile = [p.Profile for p in profiles_df.itertuples(
+        supported_profile = [p.Profile for p in df_profiles.itertuples(
             index=True) if p.Type == r.type]
         res = CS.CapabilityStatementRestResource(
             dict(
@@ -179,7 +184,7 @@ def main():
     print(f"HTML webpage of validation saved to:\n\t {path}")
 
     # get from package (json) file in local .fhir directory
-    si = get_si2(ig_package_path)
+    si = get_si2(definitions_file)
     path_map = si['paths']
     path_map
 
@@ -198,12 +203,12 @@ def main():
 
     sp_map = {sp.code: sp.type for sp in df_sp.itertuples(index=True)}
     pname_map = {p.Profile: p.Name for p in df_profiles.itertuples(index=True)}
-    pprint(pname_map)
+    print(pname_map)
 
     rendered = template.render(cs=cs, path_map=path_map,
                             pname_map=pname_map, sp_map=sp_map)
 
-    display(HTML(rendered))
+    # print(HTML(rendered))
 
 
     parser = etree.XMLParser(remove_blank_text=True)
@@ -359,7 +364,8 @@ def get_sp(r_type, df_sp, pre, canon):
             #    sp.definition = sp_specials[i.code]
             #el
             if i.update == 'Y' or i.exists == 'N':
-                sp.definition = f'{canon}SearchParameter/{pre.lower()}-{i.base.lower()}-{i.code.split("_")[-1]}'
+              #  sp.definition = f'{canon}SearchParameter/{pre.lower()}-{i.base.lower()}-{i.code.split("_")[-1]}'
+                 sp.definition = f'{canon}SearchParameter/{i.base.lower()}-{i.code.split("_")[-1]}'
             else:  # use base definition
                 # removes the '_' for things like _id
                 sp.definition = f'{fhir_base_url}SearchParameter/{i.base.lower()}-{i.code.split("_")[-1]}'
@@ -411,6 +417,19 @@ def get_op(r_type, df_op):
 
 def markdown(text, *args, **kwargs):
     return commonmark(text, *args, **kwargs)
+
+def get_si(path):
+    with tarfile.open(f'{path}/package.tgz', mode='r') as tf:
+        #pprint(tf.getnames())
+        f = tf.extractfile('other/spec.internals')
+        r = f.read()
+        return(loads(r))
+
+def get_si2(path):
+    with open(f'{path}', 'r', encoding='utf-8-sig') as f:
+        r = f.read()
+        return(loads(r, encoding = 'utf-8'))
+
 
 
 main()
