@@ -1,19 +1,4 @@
-'''
-Benjamin Langley
 
-Usage: python3 R4CapStatement_Maker.py [xlsx file]
-Dependecies: 
-    fhirclient
-    pandas
-    xlrd
-    stringcase
-
-To install all dependencies: pip3 install -r requirements.txt
-
-NOTE: this requires the r4models to be installed in the fhirclient pip site-package
-
-Modified from: https://github.com/Healthedata1/MyNotebooks/blob/master/CapStatement/R4CapStatement_Maker.ipynb
-'''
 import sys
 
 import fhirclient.r4models.capabilitystatement as CS
@@ -155,8 +140,7 @@ def main():
     resttype_dict = res.as_json()
 
     for i in ['Include', 'RevInclude']:
-        element = f'_search{i}'
-
+        element = f'_search{i}' 
         resttype_dict[element] = []
         for expectation in ['should', 'shall']:  # list all should includes first
             sp_attr = f'{expectation}_{i.lower()}'
