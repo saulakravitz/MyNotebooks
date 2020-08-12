@@ -61,7 +61,7 @@
 						<th>Supported Profiles</th>
 						<th>Supported Searches</th>
 						<th>Supported <code>_includes</code></th>
-            <th>Supported <code>_revincludes</code></th>
+                        <th>Supported <code>_revincludes</code></th>
 						<th>Supported Operations</th>
 					</tr>
 				</thead>
@@ -266,7 +266,7 @@
 							<strong>{% if s.extension %}{{ s.extension[0].valueCode }}{% else %}undefined{% endif %}</strong>
 						</td>
 						<td>
-							<a href="{% if path_map[s.definition] %}{{path_map[s.definition]}}{% else %}http://hl7.org/fhir/R4/search.html {% endif %}">{{s.name}}</a>
+							<a href="{% if path_map[s.definition] %}{{path_map[s.definition]}}{% else %}http://hl7.org/fhir/R4/search.html{% endif %}">{{s.name}}</a>
 						</td>
 						<td>
 							{{s.type}}

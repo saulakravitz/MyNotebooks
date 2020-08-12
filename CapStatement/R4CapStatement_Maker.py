@@ -1,6 +1,20 @@
+'''
+Benjamin Langley
 
+Usage: python3 R4CapStatement_Maker.py [xlsx file]
+Dependecies: 
+    fhirclient
+    pandas
+    xlrd
+    stringcase
+
+To install all dependencies: pip3 install -r requirements.txt
+
+NOTE: this requires the r4models to be installed in the fhirclient pip site-package
+
+Modified from: https://github.com/Healthedata1/MyNotebooks/blob/master/CapStatement/R4CapStatement_Maker.ipynb
+'''
 import sys
-
 import fhirclient.r4models.capabilitystatement as CS
 import fhirclient.r4models.codeableconcept as CC
 import fhirclient.r4models.fhirdate as D
@@ -8,6 +22,7 @@ import fhirclient.r4models.extension as X
 import fhirclient.r4models.contactdetail as CD
 import fhirclient.r4models.narrative as N
 import fhirclient.r4models.bundle as B
+import re 
 
 import tarfile
 # import fhirclient.r4models.narrative as N
@@ -62,11 +77,12 @@ def main():
     pre = config_df.Value.pre  # for Titles - not sure this is actually used
     canon = config_df.Value.canon  # don't forget the slash  - fix using os.join or path
     publisher = config_df.Value.publisher
+    restinteraction = config_df.Value.rest
     publisher_endpoint = dict(
         system=config_df.Value.publishersystem,
         value=config_df.Value.publishervalue,
     )
-
+  
     definitions_file = config_df.Value.definitions_file   #source of  spec.internal file manually extracted from downloaded spec
     # Read the meta sheet from the spreadsheet
     meta_df = read_excel(xls, 'meta', na_filter=False)
@@ -82,7 +98,7 @@ def main():
         security=dict(
             description=meta.security
         ) if meta.security else None,
-        interaction=get_rest_ints(xls),
+        interaction=get_rest_ints(xls) if restinteraction else None,
         operation=get_sys_op(xls)
     ))
     cs.rest = [rest]
@@ -113,10 +129,10 @@ def main():
                 conditionalRead=r.conditionalRead if r.conditionalRead not in none_list else None,
                 conditionalUpdate=r.conditionalUpdate if r.conditionalUpdate not in none_list else None,
                 conditionalDelete=r.conditionalDelete if r.conditionalDelete not in none_list else None,
-                referencePolicy=[x for x in r.referencePolicy.split(",") if x],
-                searchInclude=[x for x in r.shall_include.split(
+                referencePolicy=[re.sub('\s+','',x) for x in r.referencePolicy.split(",") if x],
+                searchInclude=[re.sub('\s+','',x) for x in r.shall_include.split(
                     ",") + r.should_include.split(",") if x],
-                searchRevInclude=[x for x in r.shall_revinclude.split(
+                searchRevInclude=[re.sub('\s+','',x) for x in r.shall_revinclude.split(
                     ",") + r.should_revinclude.split(",") if x],
                 interaction=get_i(r.type, df_i),
                 searchParam=get_sp(r.type, df_sp, pre, canon),
