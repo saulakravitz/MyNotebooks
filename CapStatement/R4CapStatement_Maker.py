@@ -221,7 +221,8 @@ def main():
     cs.text = narr
     # save to file
     print('...........saving to file............')
-    path = Path.cwd() / f'capabilitystatement-{cs.id.lower()}.json'
+    # path = Path.cwd() / f'capabilitystatement-{cs.id.lower()}.json'
+    path = Path.cwd() / f'capabilitystatement-{meta.title.lower()}.json'
     path.write_text(dumps(cs.as_json(), indent=4))
     print(f"CapabilityStatement saved to:\n\t {path}")
 
@@ -307,11 +308,13 @@ def kebab_to_pascal(word):
 
 def create_capabilitystatement(meta, canon, publisher, publisher_endpoint, xls):
     cs = CS.CapabilityStatement()
-    cs.id = meta.id
-    cs.url = f'{canon}CapabilityStatement/{meta.id}'
+#    cs.id = meta.id
+    cs.id = meta.title.lower()
+    cs.url = f'{canon}CapabilityStatement/{meta.title.lower()}'
     cs.version = meta.version
     cs.name = f'{kebab_to_pascal(meta.id)}{cs.resource_type}'
-    cs.title = f'{titlecase(meta.id).replace("Us ", "US ")} {cs.resource_type}'
+#    cs.title = f'{titlecase(meta.id).replace("Us ", "US ")} {cs.resource_type}'
+    cs.title = f'{meta.title} {cs.resource_type}'
     cs.status = 'active'
 
     cs.experimental = False
@@ -368,7 +371,8 @@ def get_sp(r_type, df_sp, pre, canon):
                  sp.definition = f'{canon}SearchParameter/{i.base.lower()}-{i.code.split("_")[-1]}'
             else:  # use base definition
                 # removes the '_' for things like _id
-                sp.definition = f'{fhir_base_url}SearchParameter/{i.base.lower()}-{i.code.split("_")[-1]}'
+                #sp.definition = f'{fhir_base_url}SearchParameter/{i.base.lower()}-{i.code.split("_")[-1]}'
+                sp.definition = f'{fhir_base_url}SearchParameter/Resource-{i.code.split("_")[-1]}'
 
             sp.type = i.type
             sp.extension = get_conf(i.base_conf)

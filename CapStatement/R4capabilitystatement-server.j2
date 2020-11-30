@@ -17,7 +17,7 @@
 				<li>Published by: {{cs.publisher}}</li>
 			</ul>
 
-			<p>{{cs.description | markdown | safe }}</p>
+			{{cs.description | markdown | safe }}
 
 			{% if cs.implementationGuide|length > 1 %}
 	    <h3 class="no_toc" id="igs">SHALL Support the Following Implementation Guides:</h3>
@@ -225,10 +225,11 @@
 						<code class="highlighter-rouge">GET [base]/{{r.type}}/[id]/_history/vid</code>
 				</li><br />
 				{%endfor %}
-				<!-- Only SHOULDs for include for now the capability statement does not create the primitive extensios for this yet -->
+				<!-- Only SHALL for include for now the capability statement does not create the primitive
+				     extensios for this yet.  -->
 				{%if r.searchInclude %}
 				<li>
-					A {{ cs.rest[0].mode | capitalize }} <strong>SHOULD</strong> be capable of supporting the following _includes:
+					A {{ cs.rest[0].mode | capitalize }} <strong>SHALL</strong> be capable of supporting the following _includes:
 					<br />
 					{% for include in r.searchInclude %}
 						{{include}} - <code class="highlighter-rouge">GET [base]/{{r.type}}?[parameter=value]&amp;_include={{include}}</code><br />
